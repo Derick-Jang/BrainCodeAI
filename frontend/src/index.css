@@ -1,0 +1,33 @@
+/**
+ * Global Styles
+ * 
+ * This file contains the main CSS configuration including Tailwind CSS imports
+ * and custom base styles for the application. Establishes consistent typography,
+ * font smoothing, and box model behavior across all components.
+ */
+
+@tailwind base; /* Tailwind's base/reset styles */
+@tailwind components; /* Tailwind's component classes */
+@tailwind utilities; /* Tailwind's utility classes */
+
+/* Global Custom Styles */
+
+* { /* Universal Box Sizing - Ensures all elements use border-box sizing for more predictable layouts */
+  box-sizing: border-box;
+}
+
+body { /* Body Element Styling - Sets up typography, removes margins, applies font smoothing */
+  margin: 0; /* Remove default browser margins */
+  
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', /* Modern font stack prioritizing system fonts for better performance */
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  
+  -webkit-font-smoothing: antialiased; /* WebKit browsers (Safari, Chrome) */
+  -moz-osx-font-smoothing: grayscale; /* Firefox on macOS */
+}
+
+code { /* Code Element Styling - Defines monospace font stack for code elements */
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
