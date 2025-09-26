@@ -6,11 +6,12 @@
  * 
  * @param {Object} problem - The problem object containing all problem data
  * @param {string} problem.title - The problem title (e.g., "Two Sum")
- * @param {string} problem.number - The problem number (e.g., "1")
+ * @param {string} problem.leetcode_problem_id - The problem number (e.g., "1")
  * @param {string} problem.difficulty - Problem difficulty: "Easy", "Medium", or "Hard"
  * @param {string} problem.description - Detailed problem description
  * @param {Array} problem.examples - Array of example objects with input/output/explanation
  * @param {Array} problem.constraints - Array of constraint strings
+ * @param {string} problem.category - The problem category (e.g., "Arrays-&-Hashing")
  */
 
 import React from 'react';
@@ -21,7 +22,7 @@ const Problem = ({ problem }) => {
       {/* Problem Header: Number, Title, and Difficulty Badge */}
       <div className="flex items-center justify-between mb-2.5">
         <div className="flex items-center gap-3">
-          <span className="text-lg font-medium text-gray-600">{problem.number}.</span> {/* Problem number*/}
+          <span className="text-lg font-medium text-gray-600">{problem.leetcode_problem_id}.</span> {/* Problem number*/}
           <h2 className="text-xl font-medium text-gray-900">{problem.title}</h2> {/* Problem title */}
         </div>
         <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">{problem.difficulty}</span> {/* Difficulty badge - hardcoded Easy styling */}

@@ -1,8 +1,10 @@
+// Import required modules
 const express = require('express');
 const OpenAI = require('openai');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
+const { query } = require('./database');
 
 // Create an Express application instance - this is our web server
 const app = express();
@@ -14,17 +16,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Enable CORS (Cross-Origin Resource Sharing) - allows frontend to call this API
-/*
-app.use(cors({
-  origin: true, // Allow all origins for development
-  credentials: false,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-  optionsSuccessStatus: 200
-}));
-*/
-
+// Enable CORS Middleware
 app.use(cors());
 // Parse JSON request bodies - converts JSON data from requests into JavaScript objects
 app.use(express.json({ limit: '10mb' }));
@@ -37,55 +29,9 @@ const limiter = rateLimit({
     error: 'Too many requests, please try again later.'
   }
 });
-// Apply rate limiting to all API routes (anything starting with /api/)
-// Temporarily disabled for development
-// app.use('/api/', limiter);
 
-// Store problem data in memory - for MVP we only have one problem
-const PROBLEMS = {
-  'two-sum': { // Problem ID as the key
-    id: 'two-sum', // Unique identifier for this problem
-    number: 1, // Problem number
-    title: 'Two Sum', // Display name of the problem
-    difficulty: 'Easy', // Difficulty level
-    description: `Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.
-
-You may assume that each input would have exactly one solution, and you may not use the same element twice.
-
-You can return the answer in any order.`, // Full problem description
-    
-    constraints: [ // Array of problem constraints
-      '2 <= nums.length <= 10^4', // Array size constraint
-      '-10^9 <= nums[i] <= 10^9', // Number range constraint
-      '-10^9 <= target <= 10^9', // Target range constraint
-      'Only one valid answer exists.' // Uniqueness constraint
-    ],
-    
-    examples: [ // Array of example inputs and outputs
-      {
-        input: 'nums = [2,7,11,15], target = 9', // Example input
-        output: '[0,1]', // Expected output
-        explanation: 'Because nums[0] + nums[1] == 9, we return [0, 1].' // Why this output
-      },
-      {
-        input: 'nums = [3,2,4], target = 6',
-        output: '[1,2]',
-        explanation: 'Because nums[1] + nums[2] == 6, we return [1, 2].'
-      },
-      {
-        input: 'nums = [3,3], target = 6',
-        output: '[0,1]',
-        explanation: 'Because nums[0] + nums[1] == 6, we return [0, 1].'
-      }
-    ],
-    
-    testCases: [ // Array of test cases for validation
-      { input: '[2,7,11,15], 9', expectedOutput: '[0,1]' },
-      { input: '[3,2,4], 6', expectedOutput: '[1,2]' },
-      { input: '[3,3], 6', expectedOutput: '[0,1]' }
-    ]
-  }
-};
+// Apply rate limiting to all API routes
+app.use('/api/', limiter);
 
 // Function to create a prompt for OpenAI based on problem and user code
 function createFeedbackPrompt(problemTitle, userCode, language) {
@@ -122,15 +68,15 @@ app.get('/api/health', (req, res) => {
 });
 
 // Get problem endpoint - returns the current problem data
-app.get('/api/problem', (req, res) => {
+app.get('/api/problem', async (req, res) => {
   try {
-    // Get the two-sum problem from our PROBLEMS object
-    const problem = PROBLEMS['two-sum'];
+    const result = await query('SELECT * FROM problems ORDER BY RANDOM() LIMIT 1', []);
+    const problem = result.rows[0]; // Returns the row as a javascript object
     
     // Send back success response with problem data
     res.json({
-      success: true, // Request was successful
-      data: problem // The problem data
+      success: true,
+      problemData: problem
     });
   } catch (error) {
     // If something goes wrong, log the error
@@ -175,21 +121,6 @@ app.post('/api/submit', async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'Code is too long (max 5000 characters)'
-      });
-    }
-
-    // ============================================================================
-    // PROBLEM VALIDATION SHOULD BE DONE IN THE FRONTEND OR NOT REQUIRED
-    // ============================================================================
-    
-    // For MVP, we only handle the two-sum problem
-    const problem = PROBLEMS['two-sum'];
-    
-    // Check if problem exists (should always be true for MVP)
-    if (!problem) {
-      return res.status(404).json({
-        success: false,
-        error: 'Problem not found'
       });
     }
 
@@ -266,10 +197,6 @@ app.post('/api/submit', async (req, res) => {
   }
 });
 
-// ============================================================================
-// ERROR HANDLING MIDDLEWARE
-// ============================================================================
-
 // Global error handler - catches any unhandled errors
 app.use((err, req, res, next) => {
   // Log the error
@@ -282,10 +209,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ============================================================================
-// 404 HANDLER
-// ============================================================================
-
 // Handle requests to routes that don't exist
 app.use('*', (req, res) => {
   res.status(404).json({
@@ -294,11 +217,6 @@ app.use('*', (req, res) => {
   });
 });
 
-// ============================================================================
-// START SERVER
-// ============================================================================
-
-// Start the server and listen on the specified port
 app.listen(PORT, () => {
   // Log server startup information
   console.log(`Server running on port ${PORT}`);

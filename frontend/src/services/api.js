@@ -16,7 +16,7 @@ const api = axios.create({
 export const getProblem = async () => {
   try {
     const response = await api.get('/api/problem');
-    return response.data.data; // Problem object
+    return response.data.problemData; // Type: Javascript object
   } catch (error) {
     console.error('Error fetching problem:', error);
     throw new Error('Failed to load problem. Please try again later.');
