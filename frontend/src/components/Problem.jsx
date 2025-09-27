@@ -16,7 +16,7 @@
 
 import React from 'react';
 
-const Problem = ({ problem }) => {
+const Problem = ({ problem, onNextProblem }) => {
   return (
     <div className="p-3 h-full overflow-y-auto">
       {/* Problem Header: Number, Title, and Difficulty Badge */}
@@ -24,8 +24,15 @@ const Problem = ({ problem }) => {
         <div className="flex items-center gap-3">
           <span className="text-lg font-medium text-gray-600">{problem.leetcode_problem_id}.</span> {/* Problem number*/}
           <h2 className="text-xl font-medium text-gray-900">{problem.title}</h2> {/* Problem title */}
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">{problem.difficulty}</span> {/* Difficulty badge - hardcoded Easy styling */}
         </div>
-        <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">{problem.difficulty}</span> {/* Difficulty badge - hardcoded Easy styling */}
+        {/* Next Question Button */}
+        <button
+          onClick={onNextProblem}
+          className="px-3 py-2 bg-green-400 hover:bg-green-300 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
+        >
+          Next Problem →
+        </button>
       </div>
       {/* Problem Description */}
       <div className="mb-3">

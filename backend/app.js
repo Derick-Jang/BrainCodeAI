@@ -31,7 +31,7 @@ const limiter = rateLimit({
 });
 
 // Apply rate limiting to all API routes
-app.use('/api/', limiter);
+//app.use('/api/', limiter);
 
 // Function to create a prompt for OpenAI based on problem and user code
 function createFeedbackPrompt(problemTitle, userCode, language) {

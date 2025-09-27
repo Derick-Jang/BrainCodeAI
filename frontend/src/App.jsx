@@ -27,7 +27,7 @@ function App() {
   const [problem, setProblem] = useState(null);
   const [problemLoading, setProblemLoading] = useState(true);
 
-  {/* Fetch problem data from the backend when the component mounts */}
+// Fetch problem data from the backend when the component mounts
   useEffect(() => {
     const fetchProblem = async () => {
       try {
@@ -42,6 +42,23 @@ function App() {
     };
     fetchProblem();
   }, []);
+
+  // Handles fetching the next problem
+  const handleNextProblem = async () => {
+    try {
+      setProblemLoading(true);
+      setCode("");
+      setFeedback("");
+      setError(null);
+
+      const problemData = await getProblem();
+      setProblem(problemData);
+    } catch (error) {
+      console.log('Failed to load next problem: ', error.message);
+    } finally {
+      setProblemLoading(false);
+    }
+  };
 
   // Handles clearing the code editor content
   const handleClear = () => setCode("");
@@ -79,7 +96,7 @@ function App() {
             {problemLoading ? (
               <div className="p-3">Loading Problem...</div>
             ) : problem ? (
-              <Problem problem={problem} />
+              <Problem problem={problem} onNextProblem={handleNextProblem}/>
             ) : (
               <div className="p-3 text-red-500 flex items-center justify-center h-full">Failed to load problem</div>
             )}
