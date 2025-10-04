@@ -4,7 +4,8 @@ const OpenAI = require('openai');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
-const { query } = require('./database');
+const { query } = require('./database/database');
+const { checkJwt } = require('./auth/auth');
 
 // Create an Express application instance - this is our web server
 const app = express();
@@ -17,7 +18,12 @@ const openai = new OpenAI({
 });
 
 // Enable CORS Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 // Parse JSON request bodies - converts JSON data from requests into JavaScript objects
 app.use(express.json({ limit: '10mb' }));
 
@@ -155,14 +161,12 @@ app.post('/api/submit', async (req, res) => {
     if (!feedback) {
       throw new Error('No feedback received from AI');
     }
-
     // Send back successful response with feedback
     res.json({
       success: true,
       data: {
         feedback: feedback.trim(), // Remove extra whitespace
         submittedAt: new Date().toISOString(), // When the code was submitted
-        problemTitle: problemTitle // Which problem this was for
       }
     });
 
@@ -193,6 +197,61 @@ app.post('/api/submit', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to process submission. Please try again.'
+    });
+  }
+});
+
+// Helper function to ensure user exists in database
+async function ensureUserExists(auth0Id, email, name) {
+  try {
+    // Check if user already exists
+    const existingUser = await query(
+      'SELECT id FROM users WHERE auth0_id = $1',
+      [auth0Id]
+    );
+
+    if (existingUser.rows.length > 0) {
+      return existingUser.rows[0].id;
+    }
+
+    // Create new user if doesn't exist
+    const newUser = await query(
+      'INSERT INTO users (auth0_id, email, name) VALUES ($1, $2, $3) RETURNING id',
+      [auth0Id, email, name || 'User']
+    );
+
+    return newUser.rows[0].id;
+  } catch (error) {
+    console.error('Error ensuring user exists:', error);
+    throw error;
+  }
+}
+
+// Protected endpoint for user registration/ensure user exists
+app.post('/api/register', checkJwt, async (req, res) => {
+  try {
+    const { auth0Id, name, email } = req.body;
+
+    if (!auth0Id || !email) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing user information'
+      });
+    }
+
+    // Ensure user exists in database (create if first time)
+    const userId = await ensureUserExists(auth0Id, email, name);
+    
+    res.json({
+      success: true,
+      message: 'User registered successfully',
+      userId: userId
+    });
+  } catch (error) {
+    console.error('Error registering user:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to register user'
     });
   }
 });

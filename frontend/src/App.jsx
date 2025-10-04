@@ -12,22 +12,25 @@
  */
 
 import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 import Problem from "./components/Problem.jsx";
 import CodeEditor from "./components/CodeEditor.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Feedback from "./components/Feedback.jsx";
+import Profile from "./components/Profile.jsx";
 import { getProblem, submitCode } from "./services/api.js";
 
 function App() {
-  {/* State management for code input and loading state */}
+  const { isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
   const [code, setCode] = useState("");
-  const [loading, setLoading] = useState(false);  // Rename later to codeLoading
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [feedback, setFeedback] = useState("");
   const [problem, setProblem] = useState(null);
   const [problemLoading, setProblemLoading] = useState(true);
 
-// Fetch problem data from the backend when the component mounts
+  // Fetch problem data from the backend when the component mounts
   useEffect(() => {
     const fetchProblem = async () => {
       try {
@@ -74,7 +77,7 @@ function App() {
         problemTitle: problem.title, 
         language: "python" 
       });
-      setFeedback(result);
+      setFeedback(result.feedback);
     } catch (error) {
       setError("Failed To Load Feedback");
       console.log('Error loading feedback:', error);
@@ -82,36 +85,59 @@ function App() {
       setTimeout(() => setLoading(false), 500);
     }
   };
+
+  // Show loading spinner while Auth0 is initializing
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-gray-300 border-t-gray-900 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
   
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
-      {/* Top Navigation Bar */}
-      <Navbar onSubmit={handleSubmit} onClear={handleClear} loading={loading} />
-      {/* Main Content Grid Layout */}
-      <main className="flex-1 p-2.5 grid grid-cols-2 gap-2.5">
-        {/* Left Column: Problem and Feedback */}
-        <div className="flex flex-col gap-2.5">
-          {/* Problem Description Panel */}
-          <div className="bg-white rounded-lg shadow-sm border h-1/2 overflow-hidden">
-            {problemLoading ? (
-              <div className="p-3">Loading Problem...</div>
-            ) : problem ? (
-              <Problem problem={problem} onNextProblem={handleNextProblem}/>
-            ) : (
-              <div className="p-3 text-red-500 flex items-center justify-center h-full">Failed to load problem</div>
-            )}
-          </div>
-          {/* AI Feedback Panel */}
-          <div className="h-1/2">
-            <Feedback loading={loading} feedback={feedback} error={error} />
-          </div>
-        </div>
-        {/* Right Column: Code Editor */}
-        <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-          <CodeEditor code={code} setCode={setCode} />
-        </div>
-      </main>
-    </div>
+    <Router>
+      <div className="min-h-screen bg-gray-100 flex flex-col">
+        {/* Top Navigation Bar */}
+        <Navbar onSubmit={handleSubmit} onClear={handleClear} loading={loading} />
+        {/* Main Content */}
+        <Routes>
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/" element={
+            <main className="flex-1 p-2.5 grid grid-cols-2 gap-2.5">
+              {/* Left Column: Problem and Feedback */}
+              <div className="flex flex-col gap-2.5">
+                {/* Problem Description Panel */}
+                <div className="bg-white rounded-lg shadow-sm border h-1/2 overflow-hidden">
+                  {problemLoading ? (
+                    <div className="p-3">Loading Problem...</div>
+                  ) : problem ? (
+                    <Problem problem={problem} onNextProblem={handleNextProblem}/>
+                  ) : (
+                    <div className="p-3 text-red-500 flex items-center justify-center h-full">Failed to load problem</div>
+                  )}
+                </div>
+                {/* AI Feedback Panel */}
+                <div className="h-1/2">
+                  <Feedback 
+                    loading={loading} 
+                    feedback={feedback} 
+                    error={error} 
+                  />
+                </div>
+              </div>
+              {/* Right Column: Code Editor */}
+              <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+                <CodeEditor code={code} setCode={setCode} />
+              </div>
+            </main>
+          } />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

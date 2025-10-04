@@ -13,9 +13,14 @@
  */
 
 import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { useAuth0 } from '@auth0/auth0-react';
 import { IoRefresh } from 'react-icons/io5';
 
 const Navbar = ({ onSubmit, onClear, loading, disabled}) => {
+  const location = useLocation();
+  const { isAuthenticated, user, loginWithRedirect, logout } = useAuth0();
+  
   return (
     <nav className="bg-white border-b border-gray-200 px-4 py-3 flex justify-between items-center">
       {/* Left Section: Logo/Brand and Navigation Links */}
@@ -26,12 +31,47 @@ const Navbar = ({ onSubmit, onClear, loading, disabled}) => {
         </div>
         {/* Navigation Menu Items */}
         <div className="flex items-center gap-6 text-sm">
-          {/* Active page */}
-          <span className="text-gray-900 font-medium">Problems</span>
+          {/* Problems page */}
+          <Link 
+            to="/" 
+            className={`transition-colors ${
+              location.pathname === '/' 
+                ? 'text-gray-900 font-medium' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Problems
+          </Link>
           {/* Profile page */}
-          <span className="text-gray-500">Profile</span>
-          {/* FAQ page */}
-          <span className="text-gray-500">FAQ</span>
+          {isAuthenticated ? (
+            <Link 
+              to="/profile" 
+              className={`transition-colors ${
+                location.pathname === '/profile' 
+                  ? 'text-gray-900 font-medium' 
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Profile
+            </Link>
+          ) : (
+            <button
+              onClick={() => loginWithRedirect({
+                authorizationParams: {
+                  redirect_uri: `${window.location.origin}/profile`
+                }
+              })}
+              className={`transition-colors ${
+                location.pathname === '/profile' 
+                  ? 'text-gray-900 font-medium' 
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Profile
+            </button>
+          )}
+          {/* FAQ page - placeholder for future implementation */}
+          <span className="text-gray-400 cursor-not-allowed">FAQ</span>
         </div>
       </div>
       {/* Right Section: Clear and Submit Code Buttons */}

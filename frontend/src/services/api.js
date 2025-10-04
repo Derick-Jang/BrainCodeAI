@@ -26,12 +26,49 @@ export const getProblem = async () => {
 // Submit code solution for evaluation
 export const submitCode = async ({ code, problemTitle, language = 'python' }) => {
   try {
-    const response = await api.post('/api/submit', { code, problemTitle, language });
-    return response.data.data.feedback; // Feedback string
+    const response = await api.post('/api/submit', 
+      { code, problemTitle, language }
+    );
+    
+    return {
+      feedback: response.data.data.feedback
+    };
   } catch (error) {
     console.error('Error submitting code:', error);
     throw new Error('Failed to submit code. Please try again later.');
   }
+};
+
+// Register user in database (ensures user exists for progress tracking)
+export const registerUser = async (token, id, name, email) => {
+  try {
+    const response = await api.post('/api/register', 
+    {
+      auth0Id: id,
+      name: name,
+      email: email
+    }, 
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error registering user:', error);
+    throw new Error('Failed to register user. Please try again later.');
+  }
+};
+
+// Stub functions for testing - replace with real implementations later
+export const getUserProgress = async (token) => {
+  console.log('getUserProgress called (stub)');
+  return []; // Return empty array for now
+};
+
+export const markProblemComplete = async (token, problemId) => {
+  console.log('markProblemComplete called (stub)');
+  return { success: true, message: 'Problem marked as complete (stub)' };
 };
 
 // Test backend connection health
