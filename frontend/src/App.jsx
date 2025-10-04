@@ -19,16 +19,37 @@ import CodeEditor from "./components/CodeEditor.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Feedback from "./components/Feedback.jsx";
 import Profile from "./components/Profile.jsx";
-import { getProblem, submitCode } from "./services/api.js";
+import { getProblem, submitCode, registerUser, markProblemComplete } from "./services/api.js";
 
 function App() {
-  const { isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
+  const { isAuthenticated, isLoading, getAccessTokenSilently, user } = useAuth0();
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [feedback, setFeedback] = useState("");
   const [problem, setProblem] = useState(null);
   const [problemLoading, setProblemLoading] = useState(true);
+  const [userInitialized, setUserInitialized] = useState(false);
+  const [userInitializationError, setUserInitializationError] = useState(null);
+
+  // Initialize user when authenticated
+  useEffect(() => {
+    if (isAuthenticated && !userInitialized) {
+      const initializeUser = async () => {
+        try {
+          setUserInitializationError(null);
+          const token = await getAccessTokenSilently();
+          await registerUser(token, user.sub, user.name, user.email);
+          setUserInitialized(true);
+          console.log('User initialized successfully');
+        } catch (error) {
+          console.error('Error initializing user:', error);
+          setUserInitializationError('Failed to initialize user');
+        }
+      };
+      initializeUser();
+    }
+  }, [isAuthenticated, userInitialized, getAccessTokenSilently, user]);
 
   // Fetch problem data from the backend when the component mounts
   useEffect(() => {
@@ -86,6 +107,32 @@ function App() {
     }
   };
 
+  const handleRequestHint = () => {
+    console.log('Request hint');
+  };
+
+  const handleMarkComplete = async () => {
+    try{
+      if (!isAuthenticated) {
+        setError("Not Authenticated");
+        return;
+      }
+      if (!problem) {
+        setError("Problem Not Found");
+        return;
+      }
+      
+      setError(null);
+      const token = await getAccessTokenSilently();
+      const result = await markProblemComplete(token, problem.id, problem.category, user.sub);
+      console.log('Problem marked as complete:', result);
+      handleNextProblem();
+    } catch (error) {
+      setError("Failed To Mark Problem As Complete");
+      console.log('Error marking problem as complete:', error);
+    }
+  };
+
   // Show loading spinner while Auth0 is initializing
   if (isLoading) {
     return (
@@ -105,7 +152,12 @@ function App() {
         <Navbar onSubmit={handleSubmit} onClear={handleClear} loading={loading} />
         {/* Main Content */}
         <Routes>
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile" element={
+            <Profile 
+              userInitialized={userInitialized}
+              userInitializationError={userInitializationError}
+            />
+          } />
           <Route path="/" element={
             <main className="flex-1 p-2.5 grid grid-cols-2 gap-2.5">
               {/* Left Column: Problem and Feedback */}
@@ -126,6 +178,8 @@ function App() {
                     loading={loading} 
                     feedback={feedback} 
                     error={error} 
+                    onRequestHint={handleRequestHint}
+                    onMarkComplete={handleMarkComplete}
                   />
                 </div>
               </div>

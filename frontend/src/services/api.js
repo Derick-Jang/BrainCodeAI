@@ -43,16 +43,13 @@ export const submitCode = async ({ code, problemTitle, language = 'python' }) =>
 export const registerUser = async (token, id, name, email) => {
   try {
     const response = await api.post('/api/register', 
-    {
-      auth0Id: id,
-      name: name,
-      email: email
-    }, 
+    { auth0Id: id, name: name, email: email }, 
     {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
+    console.log('User registered successfully:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error registering user:', error);
@@ -60,15 +57,38 @@ export const registerUser = async (token, id, name, email) => {
   }
 };
 
-// Stub functions for testing - replace with real implementations later
-export const getUserProgress = async (token) => {
-  console.log('getUserProgress called (stub)');
-  return []; // Return empty array for now
+export const markProblemComplete = async (token, problemId, category, auth0Id) => {
+  try {
+    const response = await api.post('/api/complete', 
+      { problemId: problemId, category: category, auth0Id: auth0Id },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+    console.log('Problem marked as complete:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error marking problem as complete:', error);
+    throw new Error('Failed to mark problem as complete. Please try again later.');
+  }
 };
 
-export const markProblemComplete = async (token, problemId) => {
-  console.log('markProblemComplete called (stub)');
-  return { success: true, message: 'Problem marked as complete (stub)' };
+// Stub functions for testing - replace with real implementations later
+export const getUserProgress = async (token, auth0Id) => {
+  try{
+    const response = await api.get(`/api/progress?auth0Id=${auth0Id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    console.log('User progress:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error getting user progress:', error);
+    throw new Error('Failed to get user progress. Please try again later.');
+  }
 };
 
 // Test backend connection health

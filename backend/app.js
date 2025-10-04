@@ -232,7 +232,7 @@ app.post('/api/register', checkJwt, async (req, res) => {
   try {
     const { auth0Id, name, email } = req.body;
 
-    if (!auth0Id || !email) {
+    if (!auth0Id || !name || !email) {
       return res.status(400).json({
         success: false,
         error: 'Missing user information'
@@ -252,6 +252,119 @@ app.post('/api/register', checkJwt, async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to register user'
+    });
+  }
+});
+
+// Protected endpoint for marking problem as complete
+app.post('/api/complete', checkJwt, async (req, res) => {
+  try {
+    const { problemId , category, auth0Id } = req.body;
+
+    if (!problemId || !category || !auth0Id) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing problem information'
+      });
+    }
+
+    const userResult = await query(
+      'SELECT id FROM users WHERE auth0_id = $1',
+      [auth0Id]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    const userId = userResult.rows[0].id;
+
+    const result = await query(
+      `INSERT INTO user_completions (user_id, problem_id, category, attempts)
+       VALUES ($1, $2, $3, 1)
+       ON CONFLICT (user_id, problem_id) 
+       DO UPDATE SET 
+         attempts = user_completions.attempts + 1
+       RETURNING *`,
+      [userId, problemId, category]
+    );
+    
+    res.json({
+      success: true,
+      message: 'Problem marked as complete',
+      completionId: result.rows[0].id
+    });
+  } catch (error) {
+    console.error('Error marking problem as complete:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to mark problem as complete'
+    });
+  }
+});
+
+// Protected endpoint for getting user progress
+app.get('/api/progress', checkJwt, async (req, res) => {
+  try {
+    const { auth0Id } = req.query;
+
+    if (!auth0Id) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing user information'
+      });
+    }
+
+    const userResult = await query(
+      'SELECT id FROM users WHERE auth0_id = $1',
+      [auth0Id]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    const userId = userResult.rows[0].id;
+
+    // Get all problems grouped by category with completion status
+    const progressQuery = `
+      SELECT 
+        p.category,
+        COUNT(DISTINCT p.id) as total_count,
+        COUNT(DISTINCT uc.problem_id) as completed_count
+      FROM problems p
+      LEFT JOIN user_completions uc ON p.id = uc.problem_id AND uc.user_id = $1
+      GROUP BY p.category
+      ORDER BY p.category
+    `;
+    
+    const progressResult = await query(progressQuery, [userId]);
+    
+    // Format the response to show progress for each category
+    const progress = progressResult.rows.map(row => ({
+      category: row.category,
+      completed: parseInt(row.completed_count) || 0,
+      total: parseInt(row.total_count) || 0,
+      percentage: row.total_count > 0 
+        ? Math.round((parseInt(row.completed_count) / parseInt(row.total_count)) * 100)
+        : 0
+    }));
+    
+    res.json({
+      success: true,
+      progress: progress
+    });
+  } catch (error) {
+    console.error('Error getting user progress:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get user progress'
     });
   }
 });

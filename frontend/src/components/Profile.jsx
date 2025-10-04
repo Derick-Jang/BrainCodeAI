@@ -8,39 +8,35 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { IoLogOutOutline } from 'react-icons/io5';
-import { getUserProgress, registerUser } from '../services/api.js';
+import { getUserProgress } from '../services/api.js';
 
-const Profile = () => {
-  const { user, logout, isAuthenticated, isLoading, getAccessTokenSilently, loginWithRedirect } = useAuth0();
+const Profile = ({ userInitialized, userInitializationError }) => {
+  const { user, logout, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
   const [progress, setProgress] = useState([]);
   const [progressLoading, setProgressLoading] = useState(false);
   const [progressError, setProgressError] = useState(null);
 
-  // Register user and fetch progress when component mounts
+  // Fetch progress when user is initialized
   useEffect(() => {
-    if (isAuthenticated) {
-      const initializeUser = async () => {
+    if (isAuthenticated && userInitialized) {
+      const fetchProgress = async () => {
         try {
           setProgressLoading(true);
           setProgressError(null);
           
           const token = await getAccessTokenSilently();
-          // First, ensure user is registered in database
-          await registerUser(token, user.sub, user.name, user.email);
-          
-          // Then fetch their progress
-          // const progressData = await getUserProgress();
-          setProgress([]);
+          const progressData = await getUserProgress(token, user.sub);
+          setProgress(progressData.progress || []);
         } catch (error) {
-          console.error('Error initializing user:', error);
+          console.error('Error fetching progress:', error);
           setProgressError('Failed to load progress');
         } finally {
           setProgressLoading(false);
         }
       };
-      initializeUser();
+      fetchProgress();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, userInitialized, getAccessTokenSilently, user]);
 
   if (isLoading) {
     return (

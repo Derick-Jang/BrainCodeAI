@@ -11,16 +11,25 @@
  */
 
 import React from 'react';
-import { SiOpenai } from "react-icons/si";
+import { SiOpenai } from 'react-icons/si';
+import { IoChatbubbleEllipsesOutline } from 'react-icons/io5';
 
-const Feedback = ({ feedback, error, loading }) => {
+const Feedback = ({ feedback, error, loading, onRequestHint, onMarkComplete }) => {
   return (
     <div className="bg-white rounded-lg shadow-sm border h-full">
       <div className="h-full flex flex-col">
         {/* Header with AI icon and title */}
-        <div className="px-4 py-2 bg-green-200 font-semibold text-xs text-gray-800 border-b border-green-300 flex items-center gap-1.5">
-          <SiOpenai className="w-4 h-4" />
-          AI Feedback
+        <div className="px-4 py-2 bg-green-200 font-semibold text-sm text-gray-800 border-b border-green-300 flex justify-between items-center gap-1.5">
+          <div className="flex items-center gap-1.5">
+            <IoChatbubbleEllipsesOutline className="w-4 h-4" />
+            AI Feedback
+          </div>
+          <button 
+            onClick={onRequestHint}
+            className="px-3 py-2 bg-green-400 hover:bg-green-500 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
+          >
+            Request Hint 💡
+          </button>
         </div>
         {/* Main content area with conditional rendering */}
         <div className="flex-1 p-2 text-gray-800 overflow-y-auto">
@@ -51,6 +60,18 @@ const Feedback = ({ feedback, error, loading }) => {
             </div>
           )}
         </div>
+        
+        {/* Mark As Completed Button - only show when there's feedback */}
+        {feedback && (
+          <div className="p-3 border-t border-gray-200 flex justify-center">
+            <button 
+              onClick={onMarkComplete}
+              className="px-3 py-3 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center"
+            >
+              Mark As Complete ✓
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
