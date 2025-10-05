@@ -64,17 +64,34 @@ Format your response in a friendly, interview-like manner.`;
 }
 
 function createHintPrompt(problemTitle, userCode, language) {
-  return `You are an experienced software engineer conducting a technical interview.
+  return `You are a helpful technical interview coach guiding a candidate through a LeetCode problem.
 
-  PROBLEM: ${problemTitle}
-  LANGUAGE: ${language}
+PROBLEM: ${problemTitle}
+LANGUAGE: ${language}
 
-  CANDIDATE'S SOLUTION:
-  \`\`\`
-  ${userCode}
-  \`\`\`
+CANDIDATE'S CURRENT CODE:
+\`\`\`${language}
+${userCode}
+\`\`\`
 
-  Provide a hint for the current problem given the context of the problem and the candidate's solution.`;
+Analyze the candidate's approach and provide a single, targeted hint that:
+1. Identifies what they're doing right (if applicable)
+2. Points out the most critical issue or inefficiency in their current approach
+3. Nudges them toward the optimal solution WITHOUT giving away the answer
+4. Uses leading questions or analogies when possible
+
+Keep the hint concise (2-4 sentences). Focus on guiding their thinking rather than providing code. If they're on the wrong track entirely, suggest reconsidering their approach. If they're close, help them refine their solution.
+
+DO NOT:
+- Provide complete solutions or large code snippets
+- Explain the entire algorithm
+- Give away the optimal data structure directly
+
+DO:
+- Ask thought-provoking questions
+- Highlight edge cases they might be missing
+- Suggest complexity improvements when relevant
+- Encourage them to think about time/space tradeoffs`;
 }
 
 // Health check endpoint - used to verify server is running
@@ -122,11 +139,29 @@ app.post('/api/hint', async (req, res) => {
     const prompt = createHintPrompt(problemTitle, code, language);
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }]
+      model: "gpt-4o-mini",
+      messages: [
+        { 
+          role: "system", 
+          content: "You are a helpful technical interview coach specializing in LeetCode problems. Provide concise, thoughtful hints that guide without giving away solutions."
+        },
+        { 
+          role: "user", 
+          content: prompt 
+        }
+      ],
+      temperature: 0.7, // Balanced creativity for varied hints
+      max_tokens: 300 // Prevent overly long hints
     });
 
     const hint = completion.choices[0]?.message?.content;
+
+    if (!hint) {
+      return res.status(500).json({
+        success: false,
+        error: 'No hint generated'
+      });
+    }
 
     res.json({
       success: true,
@@ -184,7 +219,7 @@ app.post('/api/submit', async (req, res) => {
 
     // Call OpenAI API to get feedback on the user's code
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo", // Use GPT-3.5 Turbo model
+      model: "gpt-4o-mini", // Use GPT-3.5 Turbo model
       messages: [
         {
           role: "system", // System message sets the AI's behavior
