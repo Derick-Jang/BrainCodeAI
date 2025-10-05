@@ -1,18 +1,49 @@
 /**
  * CodeEditor Component
  * 
- * A professional code editor interface with line numbers, language selection,
- * and syntax highlighting styling. Provides a clean environment for users
+ * A professional code editor interface using Monaco Editor with line numbers, 
+ * language selection, and syntax highlighting. Provides a clean environment for users
  * to write and edit their coding solutions.
  * 
  * @param {string} code - Current code content in the editor
  * @param {Function} setCode - Callback function to update the code state
+ * @param {string} selectedLanguage - Currently selected programming language
+ * @param {Function} setSelectedLanguage - Callback function to update the selected language
  */
 
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
+import { Editor } from '@monaco-editor/react';
 import { IoChevronDown } from 'react-icons/io5';
 
-const CodeEditor = ({ code, setCode }) => {
+const CodeEditor = ({ code, setCode, selectedLanguage, setSelectedLanguage }) => {
+  const languageOptions = [
+    { value: 'python', label: 'Python' },
+    { value: 'java', label: 'Java' },
+    { value: 'cpp', label: 'C++' },
+    { value: 'javascript', label: 'JavaScript' }
+  ];
+
+  // Memoize the change handler to prevent unnecessary re-renders
+  const handleEditorChange = useCallback((value) => {
+    setCode(value || '');
+  }, [setCode]);
+
+  const handleLanguageChange = useCallback((e) => {
+    setSelectedLanguage(e.target.value);
+  }, [setSelectedLanguage]);
+
+  // Memoize editor options to prevent recreation on every render
+  const editorOptions = useMemo(() => ({
+    // Essential for basic functionality
+    automaticLayout: true,
+    fontSize: 14,
+    lineNumbers: 'on',
+    tabSize: 4,
+    insertSpaces: true,
+    readOnly: false,
+    minimap: { enabled: false },
+  }), []);
+
   return (
     <div className="flex flex-col h-full">
       {/* Editor Header: Title and Language Selector */}
@@ -23,11 +54,16 @@ const CodeEditor = ({ code, setCode }) => {
         </div>
         {/* Programming Language Selector */}
         <div className="relative">
-          <select className="appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-1.5 px-3 pr-8 rounded-md text-sm font-medium" defaultValue="python">
-            <option value="python">Python</option>
-            <option value="javascript">JavaScript</option>
-            <option value="java">Java</option>
-            <option value="cpp">C++</option>
+          <select 
+            className="appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-1.5 px-3 pr-8 rounded-md text-sm font-medium"
+            value={selectedLanguage}
+            onChange={handleLanguageChange}
+          >
+            {languageOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
           {/* Custom dropdown arrow icon */}
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
@@ -35,24 +71,18 @@ const CodeEditor = ({ code, setCode }) => {
           </div>
         </div>
       </div>
-      {/* Main Editor Area */}
-      <div className="flex-1 flex flex-col bg-white"> 
-        <div className="flex-1 flex">
-          {/* Line Numbers Gutter */}
-          <div className="bg-gray-50 px-2 py-2 border-r border-gray-200 text-xs text-gray-400 font-mono select-none">
-            {Array.from({ length: 30 }, (_, i) => (
-              <div key={i} className="leading-6">{i + 1}</div>
-            ))}
-          </div>
-          {/* Code Input Area */}
-          <textarea
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            placeholder="Insert your code here..."
-            className="flex-1 w-full min-h-[300px] p-2 border-0 resize-none outline-none font-mono text-sm leading-6 bg-white text-gray-900 placeholder-gray-400"
-            spellCheck={false}
-          />
-        </div>
+      
+      {/* Monaco Editor */}
+      <div className="flex-1 bg-white overflow-auto">
+        <Editor
+          height="100%"
+          language={selectedLanguage}
+          value={code}
+          onChange={handleEditorChange}
+          theme="vs"
+          options={editorOptions}
+          loading={<div className="flex items-center justify-center h-full">Loading editor...</div>}
+        />
       </div>
     </div>
   );

@@ -19,11 +19,12 @@ import CodeEditor from "./components/CodeEditor.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Feedback from "./components/Feedback.jsx";
 import Profile from "./components/Profile.jsx";
-import { getProblem, submitCode, registerUser, markProblemComplete } from "./services/api.js";
+import { getProblem, submitCode, registerUser, markProblemComplete, requestHint } from "./services/api.js";
 
 function App() {
   const { isAuthenticated, isLoading, getAccessTokenSilently, user } = useAuth0();
   const [code, setCode] = useState("");
+  const [selectedLanguage, setSelectedLanguage] = useState("python"); // Add this line
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [feedback, setFeedback] = useState("");
@@ -72,6 +73,7 @@ function App() {
     try {
       setProblemLoading(true);
       setCode("");
+      setSelectedLanguage("python"); // Reset language to default
       setFeedback("");
       setError(null);
 
@@ -96,7 +98,7 @@ function App() {
       const result = await submitCode({ 
         code, 
         problemTitle: problem.title, 
-        language: "python" 
+        language: selectedLanguage // Use the selected language instead of hardcoded "python"
       });
       setFeedback(result.feedback);
     } catch (error) {
@@ -107,8 +109,19 @@ function App() {
     }
   };
 
-  const handleRequestHint = () => {
-    console.log('Request hint');
+  const handleRequestHint = async () => {
+    setLoading(true);
+    setError(null);
+    setFeedback("");
+    try {
+      const result = await requestHint(code, problem.title, selectedLanguage);
+      setFeedback(result);
+    } catch (error) {
+      setError("Failed To Request Hint");
+      console.log('Error requesting hint:', error);
+    } finally {
+      setTimeout(() => setLoading(false), 500);
+    }
   };
 
   const handleMarkComplete = async () => {
@@ -185,7 +198,12 @@ function App() {
               </div>
               {/* Right Column: Code Editor */}
               <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-                <CodeEditor code={code} setCode={setCode} />
+                <CodeEditor 
+                  code={code} 
+                  setCode={setCode} 
+                  selectedLanguage={selectedLanguage}
+                  setSelectedLanguage={setSelectedLanguage}
+                />
               </div>
             </main>
           } />

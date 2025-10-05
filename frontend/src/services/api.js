@@ -57,6 +57,21 @@ export const registerUser = async (token, id, name, email) => {
   }
 };
 
+export const requestHint = async (code, problemTitle, language) => {
+  try {
+    const response = await api.post('/api/hint', {
+      code,
+      problemTitle, 
+      language
+    });
+    console.log('Hint requested successfully:', response.data);
+    return response.data.hint;
+  } catch (error) {
+    console.error('Error requesting hint:', error);
+    throw new Error('Failed to request hint. Please try again later.');
+  }
+};
+
 export const markProblemComplete = async (token, problemId, category, auth0Id) => {
   try {
     const response = await api.post('/api/complete', 

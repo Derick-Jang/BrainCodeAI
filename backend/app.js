@@ -63,6 +63,20 @@ Keep your response concise (under 200 words) and encouraging. If the solution ha
 Format your response in a friendly, interview-like manner.`;
 }
 
+function createHintPrompt(problemTitle, userCode, language) {
+  return `You are an experienced software engineer conducting a technical interview.
+
+  PROBLEM: ${problemTitle}
+  LANGUAGE: ${language}
+
+  CANDIDATE'S SOLUTION:
+  \`\`\`
+  ${userCode}
+  \`\`\`
+
+  Provide a hint for the current problem given the context of the problem and the candidate's solution.`;
+}
+
 // Health check endpoint - used to verify server is running
 app.get('/api/health', (req, res) => {
   // Send back server status and timestamp
@@ -85,13 +99,44 @@ app.get('/api/problem', async (req, res) => {
       problemData: problem
     });
   } catch (error) {
-    // If something goes wrong, log the error
     console.error('Error fetching problem:', error);
-    
-    // Send back error response
     res.status(500).json({
-      success: false, // Request failed
-      error: 'Failed to fetch problem' // Error message
+      success: false,
+      error: 'Failed to fetch problem'
+    });
+  }
+});
+
+// Request hint endpoint - returns a hint for the current problem
+app.post('/api/hint', async (req, res) => {
+  try {
+    const { code, problemTitle, language } = req.body;
+
+    if (!code || !problemTitle || !language) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing problem information'
+      });
+    }
+
+    const prompt = createHintPrompt(problemTitle, code, language);
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: prompt }]
+    });
+
+    const hint = completion.choices[0]?.message?.content;
+
+    res.json({
+      success: true,
+      hint: hint
+    });
+  } catch (error) {
+    console.error('Error fetching hint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch hint'
     });
   }
 });
