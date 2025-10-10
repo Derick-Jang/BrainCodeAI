@@ -1,69 +1,31 @@
-/**
- * Profile Component
- * 
- * Displays user profile information, progress tracking, and provides sign out functionality.
- * Shows user details from Auth0, progress by category, and allows users to sign out.
- */
-
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { IoLogOutOutline } from 'react-icons/io5';
-import { getUserProgress } from '../services/api.js';
+import { useProgress } from '../hooks/useProgress';
+import LoadingSpinner from '../components/common/LoadingSpinner';
+import Navbar from '../components/layout/Navbar';
 
-const Profile = ({ userInitialized, userInitializationError }) => {
-  const { user, logout, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
-  const [progress, setProgress] = useState([]);
-  const [progressLoading, setProgressLoading] = useState(false);
-  const [progressError, setProgressError] = useState(null);
-
-  // Fetch progress when user is initialized
-  useEffect(() => {
-    if (isAuthenticated && userInitialized) {
-      const fetchProgress = async () => {
-        try {
-          setProgressLoading(true);
-          setProgressError(null);
-          
-          const token = await getAccessTokenSilently();
-          const progressData = await getUserProgress(token, user.sub);
-          setProgress(progressData.progress || []);
-        } catch (error) {
-          console.error('Error fetching progress:', error);
-          setProgressError('Failed to load progress');
-        } finally {
-          setProgressLoading(false);
-        }
-      };
-      fetchProgress();
-    }
-  }, [isAuthenticated, userInitialized, getAccessTokenSilently, user]);
+const ProfilePage = ({ userInitialized }) => {
+  const { user, logout, isAuthenticated, isLoading, loginWithRedirect, getAccessTokenSilently } = useAuth0();
+  const { progress, progressLoading, progressError } = useProgress(
+    isAuthenticated, 
+    userInitialized, 
+    getAccessTokenSilently, 
+    user?.sub
+  );
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-gray-300 border-t-gray-900 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading profile...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="Loading profile..." />;
   }
 
-  // If user is not authenticated, show loading or redirect message
   if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-gray-300 border-t-gray-900 rounded-full animate-spin mx-auto mb-4"></div>
-          <h1 className="text-2xl font-semibold text-gray-900 mb-4">Redirecting to Sign In...</h1>
-          <p className="text-gray-600">Please complete the authentication process.</p>
-        </div>
-      </div>
-    );
+    loginWithRedirect();
+    return <LoadingSpinner message="Redirecting to Sign In..." />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      <Navbar />
       <div className="max-w-2xl mx-auto py-8 px-4">
         <div className="bg-white rounded-lg shadow-sm border p-8">
           <div className="text-center mb-8">
@@ -91,10 +53,7 @@ const Profile = ({ userInitialized, userInitializationError }) => {
             <div>
               <h2 className="text-lg font-medium text-gray-900 mb-4">Progress by Category</h2>
               {progressLoading ? (
-                <div className="text-center py-4">
-                  <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin mx-auto mb-2"></div>
-                  <p className="text-sm text-gray-600">Loading progress...</p>
-                </div>
+                <LoadingSpinner message="Loading progress..." />
               ) : progressError ? (
                 <div className="text-center py-4">
                   <p className="text-sm text-red-600">{progressError}</p>
@@ -148,4 +107,4 @@ const Profile = ({ userInitialized, userInitializationError }) => {
   );
 };
 
-export default Profile;
+export default ProfilePage;

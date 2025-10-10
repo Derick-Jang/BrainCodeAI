@@ -1,12 +1,13 @@
 import axios from 'axios';
+import { DEFAULT_API_BASE_URL, API_TIMEOUT_MS, API_ENDPOINTS } from '../constants/apiConstants';
 
-// API base URL from environment variable or default to localhost
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+// API base URL from environment variable or default to constant fallback
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL;
 
 // Configure axios instance with base settings
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 30000,
+  timeout: API_TIMEOUT_MS, // use centralized timeout
   headers: {
     'Content-Type': 'application/json'
   }
@@ -15,7 +16,7 @@ const api = axios.create({
 // Fetch a coding problem from the backend
 export const getProblem = async () => {
   try {
-    const response = await api.get('/api/problem');
+    const response = await api.get(API_ENDPOINTS.PROBLEM);
     return response.data.problemData; // Type: Javascript object
   } catch (error) {
     console.error('Error fetching problem:', error);
@@ -26,13 +27,11 @@ export const getProblem = async () => {
 // Submit code solution for evaluation
 export const submitCode = async ({ code, problemTitle, language = 'python' }) => {
   try {
-    const response = await api.post('/api/submit', 
+    const response = await api.post(API_ENDPOINTS.SUBMIT, 
       { code, problemTitle, language }
     );
     
-    return {
-      feedback: response.data.data.feedback
-    };
+    return response.data.data.feedback
   } catch (error) {
     console.error('Error submitting code:', error);
     throw new Error('Failed to submit code. Please try again later.');
@@ -42,7 +41,7 @@ export const submitCode = async ({ code, problemTitle, language = 'python' }) =>
 // Register user in database (ensures user exists for progress tracking)
 export const registerUser = async (token, id, name, email) => {
   try {
-    const response = await api.post('/api/register', 
+    const response = await api.post(API_ENDPOINTS.REGISTER, 
     { auth0Id: id, name: name, email: email }, 
     {
       headers: {
@@ -59,7 +58,7 @@ export const registerUser = async (token, id, name, email) => {
 
 export const requestHint = async (code, problemTitle, language) => {
   try {
-    const response = await api.post('/api/hint', {
+    const response = await api.post(API_ENDPOINTS.HINT, {
       code,
       problemTitle, 
       language
@@ -74,7 +73,7 @@ export const requestHint = async (code, problemTitle, language) => {
 
 export const markProblemComplete = async (token, problemId, category, auth0Id) => {
   try {
-    const response = await api.post('/api/complete', 
+    const response = await api.post(API_ENDPOINTS.COMPLETE, 
       { problemId: problemId, category: category, auth0Id: auth0Id },
       {
         headers: {
@@ -93,7 +92,7 @@ export const markProblemComplete = async (token, problemId, category, auth0Id) =
 // Stub functions for testing - replace with real implementations later
 export const getUserProgress = async (token, auth0Id) => {
   try{
-    const response = await api.get(`/api/progress?auth0Id=${auth0Id}`, {
+    const response = await api.get(`${API_ENDPOINTS.PROGRESS}?auth0Id=${auth0Id}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -109,7 +108,7 @@ export const getUserProgress = async (token, auth0Id) => {
 // Test backend connection health
 export const testConnection = async () => {
   try {
-    const response = await api.get('/api/health');
+    const response = await api.get(API_ENDPOINTS.HEALTH);
     return response.data;
   } catch (error) {
     console.error('Health check failed:', error);

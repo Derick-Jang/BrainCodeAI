@@ -14,14 +14,11 @@
 import React, { useCallback, useMemo } from 'react';
 import { Editor } from '@monaco-editor/react';
 import { IoChevronDown } from 'react-icons/io5';
+import LoadingSpinner from '../common/LoadingSpinner';
+import { SUPPORTED_LANGUAGES, EDITOR_CONFIG } from '../../constants/userInterfaceConstants';
 
 const CodeEditor = ({ code, setCode, selectedLanguage, setSelectedLanguage }) => {
-  const languageOptions = [
-    { value: 'python', label: 'Python' },
-    { value: 'java', label: 'Java' },
-    { value: 'cpp', label: 'C++' },
-    { value: 'javascript', label: 'JavaScript' }
-  ];
+  const languageOptions = SUPPORTED_LANGUAGES;
 
   // Memoize the change handler to prevent unnecessary re-renders
   const handleEditorChange = useCallback((value) => {
@@ -34,14 +31,13 @@ const CodeEditor = ({ code, setCode, selectedLanguage, setSelectedLanguage }) =>
 
   // Memoize editor options to prevent recreation on every render
   const editorOptions = useMemo(() => ({
-    // Essential for basic functionality
     automaticLayout: true,
-    fontSize: 14,
-    lineNumbers: 'on',
-    tabSize: 4,
+    fontSize: EDITOR_CONFIG.fontSize,
+    lineNumbers: EDITOR_CONFIG.lineNumbers,
+    tabSize: EDITOR_CONFIG.tabSize,
     insertSpaces: true,
     readOnly: false,
-    minimap: { enabled: false },
+    minimap: EDITOR_CONFIG.minimap,
   }), []);
 
   return (
@@ -81,7 +77,7 @@ const CodeEditor = ({ code, setCode, selectedLanguage, setSelectedLanguage }) =>
           onChange={handleEditorChange}
           theme="vs"
           options={editorOptions}
-          loading={<div className="flex items-center justify-center h-full">Loading editor...</div>}
+          loading={<LoadingSpinner message="Loading code editor..." />}
         />
       </div>
     </div>
