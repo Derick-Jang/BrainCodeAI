@@ -15,12 +15,12 @@ const ProfilePage = ({ userInitialized }) => {
   );
 
   if (isLoading) {
-    return <LoadingSpinner message="Loading profile..." />;
+    return <LoadingSpinner message="Loading profile..." fullScreen={true} />;
   }
 
   if (!isAuthenticated) {
     loginWithRedirect();
-    return <LoadingSpinner message="Redirecting to Sign In..." />;
+    return <LoadingSpinner message="Redirecting to Sign In..." fullScreen={true} />;
   }
 
   return (
@@ -53,7 +53,9 @@ const ProfilePage = ({ userInitialized }) => {
             <div>
               <h2 className="text-lg font-medium text-gray-900 mb-4">Progress by Category</h2>
               {progressLoading ? (
-                <LoadingSpinner message="Loading progress..." />
+                <div className="flex items-center justify-center py-8">
+                  <LoadingSpinner message="Loading progress..." />
+                </div>
               ) : progressError ? (
                 <div className="text-center py-4">
                   <p className="text-sm text-red-600">{progressError}</p>
