@@ -1,6 +1,4 @@
 const { Pool } = require('pg');
-const fs = require('fs');
-const path = require('path');
 
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -20,23 +18,6 @@ pool.on('error', (err) => {
   process.exit(-1);
 });
 
-const initializeDatabase = async () => {
-  try {
-    const filePath = path.join(__dirname, '../database/schema.sql');
-    const sql = fs.readFileSync(filePath, 'utf8');
-
-    await pool.query('BEGIN');
-    await pool.query(sql);
-    await pool.query('COMMIT');
-
-    console.log('Database successfully initialized and populated');
-  } catch (error) {
-    await pool.query('ROLLBACK');
-    console.error('Error initializing database:', error);
-    throw error;
-  }
-};
-
 const query = async (text, params) => {
   try {
     const res = await pool.query(text, params);
@@ -54,6 +35,5 @@ const getClient = async () => {
 module.exports = {
   pool,
   query,
-  getClient,
-  initializeDatabase
+  getClient
 };

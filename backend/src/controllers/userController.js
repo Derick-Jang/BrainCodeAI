@@ -26,7 +26,9 @@ const completeProblem = async (req, res, next) => {
     res.json({
       success: true,
       message: 'Problem marked as complete',
-      completionId: completion.id
+      data: {
+        id: completion.id
+      }
     });
   } catch (error) {
     next(error);
@@ -42,7 +44,7 @@ const getProgress = async (req, res, next) => {
     
     res.json({
       success: true,
-      progress
+      data: progress
     });
   } catch (error) {
     next(error);

@@ -1,13 +1,14 @@
 import React from 'react';
 
 /**
- * ErrorMessage Component For Feedback
+ * ErrorMessage Component
  * 
- * Displays an error message in a styled container.
+ * Displays error messages in a consistent, user-friendly format.
+ * Used throughout the app to show API errors and other failure states.
  * 
  * @param {string} message - The error message to display
  */
-const ErrorMessage = ({ message }) => {
+const errorMessage = ({ message }) => {
   return (
     <div className="flex items-center justify-center h-full text-red-600">
       <div className="text-center">
@@ -18,4 +19,4 @@ const ErrorMessage = ({ message }) => {
   );
 };
 
-export default ErrorMessage;
+export default errorMessage;

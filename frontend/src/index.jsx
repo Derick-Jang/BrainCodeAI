@@ -1,22 +1,19 @@
 /**
  * Application Entry Point
  * 
- * This file serves as the main entry point for the React application.
- * It initializes the React root, imports global styles, and renders
- * the main App component into the DOM.
- * 
+ * Initializes React 18 root and renders the main App component with Auth0 authentication.
  */
 
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Auth0Provider } from "@auth0/auth0-react";
-import App from "./App";
+import App from "./app";
 import "./index.css";
 
-const rootElement = document.getElementById("root"); // Find the root DOM element from index.html
+const rootElement = document.getElementById("root");
 
 if (rootElement) {
-  const reactRoot = createRoot(rootElement); // Create React 18 root for improved performance and concurrent features
+  const reactRoot = createRoot(rootElement);
   reactRoot.render(
     <Auth0Provider
       domain={import.meta.env.VITE_AUTH0_DOMAIN}
@@ -29,7 +26,7 @@ if (rootElement) {
     >
       <App />
     </Auth0Provider>
-  ); // Render the main App component wrapped with Auth0Provider
+  );
 } else {
-  console.error("Root element not found. No div with id='root' in index.html"); // Error handling: log if root element is not found
+  console.error("Root element not found. No div with id='root' in index.html");
 }

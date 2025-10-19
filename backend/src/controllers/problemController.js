@@ -1,13 +1,12 @@
-const { query } = require('../config/database');
+const { getRandomProblem: getRandomProblemService } = require('../services/problemService');
 
 const getRandomProblem = async (req, res, next) => {
   try {
-    const result = await query('SELECT * FROM problems ORDER BY RANDOM() LIMIT 1', []);
-    const problem = result.rows[0];
+    const problem = await getRandomProblemService();
     
     res.json({
       success: true,
-      problemData: problem
+      data: problem
     });
   } catch (error) {
     next(error);

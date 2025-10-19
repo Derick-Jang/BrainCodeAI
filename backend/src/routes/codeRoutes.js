@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { submitCode, requestHint } = require('../controllers/codeController');
-const { validateCodeSubmission } = require('../middleware/validation');
+const { validateCodeSubmission, validateHintRequest } = require('../middleware/validation');
 
+// POST /api/code/submit - Validate before submitting code
 router.post('/submit', validateCodeSubmission, submitCode);
-router.post('/hint', validateCodeSubmission, requestHint);
+
+// POST /api/code/hint - Validate before requesting hint
+router.post('/hint', validateHintRequest, requestHint);
 
 module.exports = router;

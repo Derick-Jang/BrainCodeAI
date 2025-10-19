@@ -1,10 +1,6 @@
 const app = require('./app');
-const { initializeDatabase } = require('./config/database');
 
 const PORT = process.env.PORT || 4000;
-
-// Optional: Initialize database on startup
-// initializeDatabase().catch(console.error);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

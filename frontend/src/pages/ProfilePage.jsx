@@ -1,12 +1,20 @@
-import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { IoLogOutOutline } from 'react-icons/io5';
-import { useProgress } from '../hooks/useProgress';
-import LoadingSpinner from '../components/common/LoadingSpinner';
-import Navbar from '../components/layout/Navbar';
+import useAuth from '../hooks/useAuth';
+import useProgress from '../hooks/useProgress';
+import LoadingSpinner from '../components/common/loadingSpinner';
+import Navbar from '../components/layout/navbar';
 
-const ProfilePage = ({ userInitialized }) => {
-  const { user, logout, isAuthenticated, isLoading, loginWithRedirect, getAccessTokenSilently } = useAuth0();
+/**
+ * ProfilePage Component
+ * 
+ * Displays user profile information and progress tracking across problem categories.
+ * Shows completion statistics with visual progress bars for each category.
+ * Requires authentication to access.
+ */
+const profilePage = () => {
+  const { user, isAuthenticated, isLoading, userInitialized, getAccessTokenSilently } = useAuth();
+  const { logout, loginWithRedirect } = useAuth0();
   const { progress, progressLoading, progressError } = useProgress(
     isAuthenticated, 
     userInitialized, 
@@ -14,10 +22,12 @@ const ProfilePage = ({ userInitialized }) => {
     user?.sub
   );
 
+  // Show loading while Auth0 is initializing
   if (isLoading) {
     return <LoadingSpinner message="Loading profile..." fullScreen={true} />;
   }
 
+  // Redirect to login if not authenticated
   if (!isAuthenticated) {
     loginWithRedirect();
     return <LoadingSpinner message="Redirecting to Sign In..." fullScreen={true} />;
@@ -109,4 +119,4 @@ const ProfilePage = ({ userInitialized }) => {
   );
 };
 
-export default ProfilePage;
+export default profilePage;

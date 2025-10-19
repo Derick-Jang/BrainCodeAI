@@ -9,8 +9,7 @@ const submitCode = async (req, res, next) => {
     res.json({
       success: true,
       data: {
-        feedback,
-        submittedAt: new Date().toISOString(),
+        feedback
       }
     });
   } catch (error) {

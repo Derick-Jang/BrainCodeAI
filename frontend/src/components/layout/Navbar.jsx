@@ -3,7 +3,19 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { IoRefresh } from 'react-icons/io5';
 
-const Navbar = ({ onClear, onSubmit, loading, disabled }) => {
+/**
+ * Navbar Component
+ * 
+ * Main navigation bar with logo, navigation links, and action buttons.
+ * Shows different content based on current page and authentication state.
+ * Action buttons (Reset/Submit) only appear on the homepage.
+ * 
+ * @param {Function} onClear - Callback for reset button click
+ * @param {Function} onSubmit - Callback for submit button click
+ * @param {boolean} loading - Whether an action is currently loading
+ * @param {boolean} disabled - Whether buttons should be disabled
+ */
+const navbar = ({ onClear, onSubmit, loading, disabled }) => {
   const location = useLocation();
   const { isAuthenticated, loginWithRedirect } = useAuth0();
   const isHomePage = location.pathname === '/';
@@ -48,6 +60,7 @@ const Navbar = ({ onClear, onSubmit, loading, disabled }) => {
               Profile
             </button>
           )}
+          {/* Placeholder for future FAQ page */}
           <span className="text-gray-400 cursor-not-allowed">FAQ</span>
         </div>
       </div>
@@ -55,7 +68,6 @@ const Navbar = ({ onClear, onSubmit, loading, disabled }) => {
       {/* Only show action buttons on homepage */}
       {isHomePage && onClear && onSubmit && (
         <div className="flex gap-3 items-center">
-          {/* Clear Button */}
           <button
             onClick={onClear}
             disabled={loading || disabled}
@@ -64,7 +76,6 @@ const Navbar = ({ onClear, onSubmit, loading, disabled }) => {
             <IoRefresh className="w-4 h-4" />
             Reset
           </button>
-          {/* Submit Code Button */}
           <button
             onClick={onSubmit}
             disabled={loading || disabled}
@@ -89,4 +100,4 @@ const Navbar = ({ onClear, onSubmit, loading, disabled }) => {
   );
 };
 
-export default Navbar;
+export default navbar;

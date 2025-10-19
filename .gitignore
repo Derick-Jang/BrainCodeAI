@@ -1,21 +1,18 @@
-# Node
-node_modules/
-.npm/
+# BrainCodeAI - gitignore
+# This file tells Git which files and directories to ignore
+# when committing changes to the repository
 
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.venv/
+# Dependencies
+node_modules/
 
 # Environment variables
 .env
 .env.development
 .env.production
-.env.local
-.env.development.local
-.env.production.local
+
+# Build outputs
+dist/
+build/
 
 # OS files
 .DS_Store

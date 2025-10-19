@@ -15,8 +15,8 @@ router.get('/health', (req, res) => {
 });
 
 // Mount route modules
-router.use('/problem', problemRoutes);
-router.use('/', codeRoutes);
-router.use('/', userRoutes);
+router.use('/problems', problemRoutes);
+router.use('/code', codeRoutes);
+router.use('/users', userRoutes);
 
 module.exports = router;

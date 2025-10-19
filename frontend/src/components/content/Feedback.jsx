@@ -8,17 +8,19 @@
  * @param {string} feedback - AI-generated feedback text content
  * @param {string} error - Error message if feedback generation failed
  * @param {boolean} loading - Loading state while waiting for AI response
+ * @param {Function} onRequestHint - Callback for hint request button
+ * @param {Function} onMarkComplete - Callback for marking problem complete
  */
 
-import React from 'react';
 import { SiOpenai } from 'react-icons/si';
 import { IoChatbubbleEllipsesOutline } from 'react-icons/io5';
+import LoadingSpinner from '../common/loadingSpinner';
+import ErrorMessage from '../common/errorMessage';
 
-const Feedback = ({ feedback, error, loading, onRequestHint, onMarkComplete }) => {
+const feedback = ({ feedback, error, loading, onRequestHint, onMarkComplete }) => {
   return (
     <div className="bg-white rounded-lg shadow-sm border h-full">
       <div className="h-full flex flex-col">
-        {/* Header with AI icon and title */}
         <div className="px-4 py-2 bg-green-200 font-semibold text-sm text-gray-800 border-b border-green-300 flex justify-between items-center gap-1.5">
           <div className="flex items-center gap-1.5">
             <IoChatbubbleEllipsesOutline className="w-4 h-4" />
@@ -31,37 +33,25 @@ const Feedback = ({ feedback, error, loading, onRequestHint, onMarkComplete }) =
             Request Hint 💡
           </button>
         </div>
-        {/* Main content area with conditional rendering */}
         <div className="flex-1 p-2 text-gray-800 overflow-y-auto">
-          {loading ? ( // Loading State: Spinner and message
-            <div className="flex items-center justify-center h-full">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-6 h-6 border-2 border-gray-200 border-t-emerald-500 rounded-full animate-spin"></div> {/* Animated loading spinner */}
-                <p className="text-gray-500 text-sm">Getting feedback...</p>
-              </div>
-            </div>
-          ) : error ? ( // Error State: Display error message
-            <div className="flex items-center justify-center h-full text-red-700 text-sm">
-              <div className="text-center">
-                <div className="mb-2">❌</div>
-                <div className="text-red-500">{error}</div>
-              </div>
-            </div>
-          ) : feedback ? ( // Feedback Content: Display AI-generated feedback
+          {loading ? (
+            <LoadingSpinner message="Getting feedback..." />
+          ) : error ? (
+            <ErrorMessage message={error} />
+          ) : feedback ? (
             <div className="text-gray-700 text-sm">
               <div className="font-medium mb-2 flex items-center gap-2">
-                <SiOpenai className="w-4 h-4" /> {/* Same icon as header for consistency */}
+                <SiOpenai className="w-4 h-4" />
               </div>
-              <pre className="whitespace-pre-wrap break-words font-sans leading-relaxed">{feedback}</pre> {/* Pre-formatted text to preserve feedback formatting */}
+              <pre className="whitespace-pre-wrap break-words font-sans leading-relaxed">{feedback}</pre>
             </div>
-          ) : ( // Placeholder State: Instructions for user
+          ) : (
             <div className="flex items-center justify-center h-full text-gray-500">
               Submit your code to receive AI feedback and hints!
             </div>
           )}
         </div>
         
-        {/* Mark As Completed Button - only show when there's feedback */}
         {feedback && (
           <div className="p-3 border-t border-gray-200 flex justify-center">
             <button 
@@ -77,4 +67,4 @@ const Feedback = ({ feedback, error, loading, onRequestHint, onMarkComplete }) =
   );
 };
 
-export default Feedback;
+export default feedback;

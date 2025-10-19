@@ -11,16 +11,16 @@
  * @param {Function} setSelectedLanguage - Callback function to update the selected language
  */
 
-import React, { useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Editor } from '@monaco-editor/react';
 import { IoChevronDown } from 'react-icons/io5';
-import LoadingSpinner from '../common/LoadingSpinner';
-import { SUPPORTED_LANGUAGES, EDITOR_CONFIG } from '../../constants/userInterfaceConstants';
+import LoadingSpinner from '../common/loadingSpinner';
+import { SUPPORTED_LANGUAGES, EDITOR_CONFIG } from '../../constants/codeEditorConstants';
 
-const CodeEditor = ({ code, setCode, selectedLanguage, setSelectedLanguage }) => {
+const codeEditor = ({ code, setCode, selectedLanguage, setSelectedLanguage }) => {
   const languageOptions = SUPPORTED_LANGUAGES;
 
-  // Memoize the change handler to prevent unnecessary re-renders
+  // Memoize the change handler to prevent unnecessary re-renders and improve performance
   const handleEditorChange = useCallback((value) => {
     setCode(value || '');
   }, [setCode]);
@@ -29,7 +29,7 @@ const CodeEditor = ({ code, setCode, selectedLanguage, setSelectedLanguage }) =>
     setSelectedLanguage(e.target.value);
   }, [setSelectedLanguage]);
 
-  // Memoize editor options to prevent recreation on every render
+  // Memoize editor options to prevent recreation on every render and improve performance
   const editorOptions = useMemo(() => ({
     automaticLayout: true,
     fontSize: EDITOR_CONFIG.fontSize,
@@ -42,13 +42,10 @@ const CodeEditor = ({ code, setCode, selectedLanguage, setSelectedLanguage }) =>
 
   return (
     <div className="flex flex-col h-full">
-      {/* Editor Header: Title and Language Selector */}
       <div className="flex justify-between items-center px-2 py-1.5 border-b border-gray-200 bg-white">
-        {/* Editor title with code brackets icon */}
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-gray-700">&lt; &gt; Code Editor</span>
         </div>
-        {/* Programming Language Selector */}
         <div className="relative">
           <select 
             className="appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-1.5 px-3 pr-8 rounded-md text-sm font-medium"
@@ -61,14 +58,12 @@ const CodeEditor = ({ code, setCode, selectedLanguage, setSelectedLanguage }) =>
               </option>
             ))}
           </select>
-          {/* Custom dropdown arrow icon */}
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
             <IoChevronDown className="h-4 w-4" />
           </div>
         </div>
       </div>
       
-      {/* Monaco Editor */}
       <div className="flex-1 bg-white overflow-auto">
         <Editor
           height="100%"
@@ -84,4 +79,4 @@ const CodeEditor = ({ code, setCode, selectedLanguage, setSelectedLanguage }) =>
   );
 };
 
-export default CodeEditor;
+export default codeEditor;

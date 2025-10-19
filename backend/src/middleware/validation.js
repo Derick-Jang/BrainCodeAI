@@ -1,79 +1,65 @@
-const validateCodeSubmission = (req, res, next) => {
-    const { code, problemTitle, language } = req.body;
-  
-    if (!code || typeof code !== 'string') {
-      return res.status(400).json({
-        success: false,
-        error: 'Code is required and must be a string'
-      });
+const { ZodError } = require('zod');
+const {
+  userRegistrationSchema,
+  codeSubmissionSchema,
+  hintRequestSchema,
+  problemCreationSchema,
+  problemCompletionSchema,
+  progressRequestSchema
+} = require('../validators/schemas');
+
+/**
+ * Generic Zod validation middleware factory
+ * @param {ZodSchema} schema - The Zod schema to validate against
+ * @param {string} source - Where to get data from: 'body', 'query', or 'params'
+ * @returns {Function} Express middleware function
+ */
+const validateRequest = (schema, source = 'body') => {
+  return (req, res, next) => {
+    try {
+      // Validate and transform data
+      const validated = schema.parse(req[source]);
+      
+      // Replace request data with validated/transformed data
+      req[source] = validated;
+      
+      next();
+    } catch (error) {
+      if (error instanceof ZodError) {
+        // Format Zod errors for API response
+        const formattedErrors = error.errors.map(err => ({
+          field: err.path.join('.'),
+          message: err.message
+        }));
+
+        return res.status(400).json({
+          success: false,
+          error: formattedErrors[0]?.message || 'Validation failed',
+          details: formattedErrors
+        });
+      }
+
+      // Pass unexpected errors to error handler
+      next(error);
     }
-  
-    if (code.trim().length === 0) {
-      return res.status(400).json({
-        success: false,
-        error: 'Code cannot be empty'
-      });
-    }
-  
-    if (code.length > 5000) {
-      return res.status(400).json({
-        success: false,
-        error: 'Code is too long (max 5000 characters)'
-      });
-    }
-  
-    if (!problemTitle || !language) {
-      return res.status(400).json({
-        success: false,
-        error: 'Problem title and language are required'
-      });
-    }
-  
-    next();
   };
-  
-  const validateUserRegistration = (req, res, next) => {
-    const { auth0Id, name, email } = req.body;
-  
-    if (!auth0Id || !name || !email) {
-      return res.status(400).json({
-        success: false,
-        error: 'Missing user information (auth0Id, name, email required)'
-      });
-    }
-  
-    next();
-  };
-  
-  const validateProblemCompletion = (req, res, next) => {
-    const { problemId, category, auth0Id } = req.body;
-  
-    if (!problemId || !category || !auth0Id) {
-      return res.status(400).json({
-        success: false,
-        error: 'Missing problem information (problemId, category, auth0Id required)'
-      });
-    }
-  
-    next();
-  };
-  
-  const validateProgressRequest = (req, res, next) => {
-    const { auth0Id } = req.query;
-  
-    if (!auth0Id) {
-      return res.status(400).json({
-        success: false,
-        error: 'Missing user information (auth0Id required)'
-      });
-    }
-  
-    next();
-  };
-  
-  module.exports = {
-    validateCodeSubmission,
-    validateUserRegistration,
-    validateProblemCompletion,
-    validateProgressRequest
-  };
+};
+
+
+// Specific Validators
+const validateCodeSubmission = validateRequest(codeSubmissionSchema, 'body');
+const validateHintRequest = validateRequest(hintRequestSchema, 'body');
+const validateUserRegistration = validateRequest(userRegistrationSchema, 'body');
+const validateProblemCreation = validateRequest(problemCreationSchema, 'body');
+const validateProblemCompletion = validateRequest(problemCompletionSchema, 'body');
+const validateProgressRequest = validateRequest(progressRequestSchema, 'query');
+
+module.exports = {
+  validateRequest,
+  validateCodeSubmission,
+  validateHintRequest,
+  validateUserRegistration,
+  validateProblemCreation,
+  validateProblemCompletion,
+  validateProgressRequest
+};
