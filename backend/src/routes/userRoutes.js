@@ -4,8 +4,8 @@ const { registerUser, completeProblem, getProgress } = require('../controllers/u
 const checkJwt = require('../middleware/auth');
 const { validateUserRegistration, validateProblemCompletion, validateProgressRequest } = require('../middleware/validation');
 
-router.post('/register', checkJwt, validateUserRegistration, registerUser);
-router.post('/complete', checkJwt, validateProblemCompletion, completeProblem);
+router.post('/', checkJwt, validateUserRegistration, registerUser);
+router.post('/completions', checkJwt, validateProblemCompletion, completeProblem);
 router.get('/progress', checkJwt, validateProgressRequest, getProgress);
 
 module.exports = router;

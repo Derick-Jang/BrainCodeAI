@@ -14,7 +14,7 @@
 import { useCallback, useMemo } from 'react';
 import { Editor } from '@monaco-editor/react';
 import { IoChevronDown } from 'react-icons/io5';
-import LoadingSpinner from '../common/loadingSpinner';
+import LoadingSpinner from '../common/LoadingSpinner';
 import { SUPPORTED_LANGUAGES, EDITOR_CONFIG } from '../../constants/codeEditorConstants';
 
 const codeEditor = ({ code, setCode, selectedLanguage, setSelectedLanguage }) => {

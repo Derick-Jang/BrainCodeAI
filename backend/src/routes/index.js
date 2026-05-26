@@ -1,9 +1,9 @@
 const express = require('express');
-const router = express.Router();
-
 const problemRoutes = require('./problemRoutes');
 const codeRoutes = require('./codeRoutes');
 const userRoutes = require('./userRoutes');
+
+const router = express.Router();
 
 // Health check
 router.get('/health', (req, res) => {

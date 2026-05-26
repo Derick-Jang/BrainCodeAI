@@ -3,9 +3,9 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import HomePage from './pages/homePage';
 import ProfilePage from './pages/profilePage';
-import LoadingSpinner from './components/common/loadingSpinner';
+import LoadingSpinner from './components/common/LoadingSpinner';
 import useAuth from './hooks/useAuth';
-import ErrorBoundary from './components/common/errorBoundary';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 /**
  * Protected version of ProfilePage that requires authentication
@@ -17,7 +17,7 @@ const ProtectedProfilePage = withAuthenticationRequired(ProfilePage, {
 
 /**
  * Main App component that handles routing and authentication state
- * Wraps all routes in ErrorBoundary for graceful error handling
+ * Wraps all routes in ErrorBoundary for error handling
  */
 function App() {
   const { isLoading } = useAuth();

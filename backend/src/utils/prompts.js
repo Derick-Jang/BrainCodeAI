@@ -45,15 +45,15 @@ const createHintPrompt = (problemTitle, userCode, language) => {
   Keep the hint concise (2-4 sentences). Focus on guiding their thinking rather than providing code. If they're on the wrong track entirely, suggest reconsidering their approach. If they're close, help them refine their solution.
 
   DO NOT:
-  - Provide complete solutions or large code snippets
+  - Provide complete solutions or code snippets
   - Explain the entire algorithm
-  - Give away the optimal data structure directly
+  - Give away the optimal data structure or algorithm directly
 
   DO:
   - Ask thought-provoking questions
   - Highlight edge cases they might be missing
   - Suggest complexity improvements when relevant
-  - Encourage them to think about time/space tradeoffs`;
+  - Encourage them to think about tradeoffs`;
 };
   
 module.exports = {

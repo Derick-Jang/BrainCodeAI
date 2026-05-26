@@ -16,7 +16,7 @@ const useProblem = () => {
   const [problemLoading, setProblemLoading] = useState(true);
 
   /**
-   * Fetches a new random problem from the backend
+   * Fetches a new problem from the backend
    * Handles loading states and error management
    */
   const fetchProblem = async () => {

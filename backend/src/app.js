@@ -14,7 +14,7 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 
 // Rate limiting (commented out for development)
-// app.use('/api/', limiter);
+// app.use('/api/code', limiter);
 
 // Routes
 app.use('/api', routes);

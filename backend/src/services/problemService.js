@@ -17,20 +17,50 @@ const getRandomProblem = async () => {
 
 const getUncompletedRandomProblem = async (userId) => {
   try {
-    const result = await query('SELECT * FROM problems WHERE id NOT IN (SELECT problem_id FROM user_completions WHERE user_id = $1)', [userId]);
-    return result.rows;
+    const result = await query(
+      `SELECT * FROM problems
+       WHERE id NOT IN (SELECT problem_id FROM user_completions WHERE user_id = $1)
+       ORDER BY RANDOM()
+       LIMIT 1`,
+      [userId]
+    );
+    return result.rows[0];
   } catch (error) {
-    console.error('Error fetching uncompleted problems:', error);
+    console.error('Error fetching uncompleted random problem:', error);
     throw error;
   }
 };
 
-const getUncompletedRandomProblemByCategory = async (category) => {
+const getUncompletedRandomProblemByCategory = async (userId, category) => {
   try {
-    const result = await query('SELECT * FROM problems WHERE category = $1 ORDER BY leetcode_problem_id LIMIT 1', [category]);
+    const result = await query(
+      `SELECT * FROM problems
+       WHERE category = $1
+         AND id NOT IN (SELECT problem_id FROM user_completions WHERE user_id = $2)
+       ORDER BY RANDOM()
+       LIMIT 1`,
+      [category, userId]
+    );
     return result.rows[0];
   } catch (error) {
-    console.error('Error fetching new problem by category:', error);
+    console.error('Error fetching uncompleted random problem by category:', error);
+    throw error;
+  }
+};
+
+const getUncompletedRandomProblemByDifficulty = async (userId, difficulty) => {
+  try {
+    const result = await query(
+      `SELECT * FROM problems
+       WHERE difficulty = $1
+         AND id NOT IN (SELECT problem_id FROM user_completions WHERE user_id = $2)
+       ORDER BY RANDOM()
+       LIMIT 1`,
+      [difficulty, userId]
+    );
+    return result.rows[0];
+  } catch (error) {
+    console.error('Error fetching uncompleted random problem by difficulty:', error);
     throw error;
   }
 };

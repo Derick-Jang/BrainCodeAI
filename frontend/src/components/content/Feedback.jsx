@@ -14,7 +14,7 @@
 
 import { SiOpenai } from 'react-icons/si';
 import { IoChatbubbleEllipsesOutline } from 'react-icons/io5';
-import LoadingSpinner from '../common/loadingSpinner';
+import LoadingSpinner from '../common/LoadingSpinner';
 import ErrorMessage from '../common/errorMessage';
 
 const feedback = ({ feedback, error, loading, onRequestHint, onMarkComplete }) => {

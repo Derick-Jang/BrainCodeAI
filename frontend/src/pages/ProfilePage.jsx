@@ -2,7 +2,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { IoLogOutOutline } from 'react-icons/io5';
 import useAuth from '../hooks/useAuth';
 import useProgress from '../hooks/useProgress';
-import LoadingSpinner from '../components/common/loadingSpinner';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 import Navbar from '../components/layout/navbar';
 
 /**
@@ -36,7 +36,7 @@ const profilePage = () => {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
       <Navbar />
-      <div className="max-w-2xl mx-auto py-8 px-4">
+      <div className="flex-1 p-2.5 w-full">
         <div className="bg-white rounded-lg shadow-sm border p-8">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-semibold text-gray-900 mb-2">
@@ -99,14 +99,14 @@ const profilePage = () => {
               )}
             </div>
 
-            <div className="pt-6 border-t border-gray-200">
+            <div className="pt-6 border-t border-gray-200 flex justify-center">
               <button
                 onClick={() => logout({ 
                   logoutParams: { 
                     returnTo: window.location.origin 
                   } 
                 })}
-                className="w-full bg-red-600 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-red-700 transition-colors duration-200 flex items-center justify-center gap-2"
+                className="w-1/3 bg-red-600 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-red-700 transition-colors duration-200 flex items-center justify-center gap-2"
               >
                 <IoLogOutOutline className="w-4 h-4" />
                 Sign Out

@@ -135,7 +135,6 @@ const postRequestHint = async ({ code, problemTitle, language }) => {
 
   try {
     const response = await api.post(API_ENDPOINTS.HINT, validationResult.data);
-    console.log('Hint requested successfully:', response.data);
     return response.data.hint;
   } catch (error) {
     console.error('Error requesting hint:', error);

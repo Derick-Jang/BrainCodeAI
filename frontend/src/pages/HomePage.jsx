@@ -7,15 +7,15 @@ import CodeEditor from '../components/forms/codeEditor';
 import Feedback from '../components/content/feedback';
 import Navbar from '../components/layout/navbar';
 import { DEFAULT_LANGUAGE, LOADING_DELAY_MS } from '../constants/codeEditorConstants';
-import LoadingSpinner from '../components/common/loadingSpinner';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/errorMessage';
 
 /**
  * HomePage Component
  * 
  * Main application interface where users solve coding problems.
- * Features a split-screen layout with problem description on the left
- * and code editor on the right, plus AI feedback panel.
+ * Features a split-screen layout with problem description on the upper left, 
+ * AI feedback panel on the lower left, and code editor on the right
  * 
  */
 const homePage = () => {
@@ -108,7 +108,6 @@ const homePage = () => {
    */
   const handleNextProblem = async () => {
     setCode('');
-    setSelectedLanguage(DEFAULT_LANGUAGE);
     setFeedback('');
     setError(null);
     await nextProblem();
