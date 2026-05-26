@@ -40,28 +40,13 @@ const profilePage = () => {
         <div className="bg-white rounded-lg shadow-sm border p-8">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-              Welcome, {user.name || user.email}!
+              Welcome, {user.name || "User"}!
             </h1>
-            <p className="text-gray-600">{user.email}</p>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-6 flex flex-col gap-6">
             <div>
-              <h2 className="text-lg font-medium text-gray-900 mb-4">Profile Information</h2>
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Name</label>
-                  <p className="mt-1 text-sm text-gray-900">{user.name || 'Not provided'}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Email</label>
-                  <p className="mt-1 text-sm text-gray-900">{user.email}</p>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h2 className="text-lg font-medium text-gray-900 mb-4">Progress by Category</h2>
+              <h2 className="text-lg font-medium text-gray-900 mb-4 text-center">Progress</h2>
               {progressLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <LoadingSpinner message="Loading progress..." />
