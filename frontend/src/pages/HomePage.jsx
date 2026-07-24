@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { postSubmitCode, postRequestHint, postMarkProblemComplete } from '../services/api';
 import useAuth from '../hooks/useAuth';
 import useProblem from '../hooks/useProblem';
-import Problem from '../components/content/problem';
-import CodeEditor from '../components/forms/codeEditor';
-import Feedback from '../components/content/feedback';
-import Navbar from '../components/layout/navbar';
+import Problem from '../components/content/Problem';
+import CodeEditor from '../components/forms/CodeEditor';
+import Feedback from '../components/content/Feedback';
+import Navbar from '../components/layout/Navbar';
 import { DEFAULT_LANGUAGE, LOADING_DELAY_MS } from '../constants/codeEditorConstants';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import ErrorMessage from '../components/common/errorMessage';
+import ErrorMessage from '../components/common/ErrorMessage';
 
 /**
  * HomePage Component

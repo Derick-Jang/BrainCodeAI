@@ -3,7 +3,7 @@ import { IoLogOutOutline } from 'react-icons/io5';
 import useAuth from '../hooks/useAuth';
 import useProgress from '../hooks/useProgress';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import Navbar from '../components/layout/navbar';
+import Navbar from '../components/layout/Navbar';
 
 /**
  * ProfilePage Component
