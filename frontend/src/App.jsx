@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
@@ -29,14 +29,12 @@ function App() {
   
   return (
     <ErrorBoundary>
-      <Router>
-        <div className="min-h-screen bg-gray-100 flex flex-col">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/profile" element={<ProtectedProfilePage />} />
-          </Routes>
-        </div>
-      </Router>
+      <div className="min-h-screen bg-gray-100 flex flex-col">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/profile" element={<ProtectedProfilePage />} />
+        </Routes>
+      </div>
     </ErrorBoundary>
   );
 }

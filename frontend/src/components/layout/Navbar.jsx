@@ -51,9 +51,7 @@ const navbar = ({ onClear, onSubmit, loading, disabled }) => {
           ) : (
             <button
               onClick={() => loginWithRedirect({
-                authorizationParams: {
-                  redirect_uri: `${window.location.origin}/profile`
-                }
+                appState: { returnTo: '/profile' }
               })}
               className="text-gray-500 hover:text-gray-700 transition-colors"
             >

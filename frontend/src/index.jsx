@@ -6,15 +6,18 @@
 
 import React from "react";
 import { createRoot } from "react-dom/client";
+import { BrowserRouter, useNavigate } from "react-router-dom";
 import { Auth0Provider } from "@auth0/auth0-react";
 import App from "./App";
 import "./index.css";
 
-const rootElement = document.getElementById("root");
+/**
+ * Wraps Auth0Provider so post-login redirects use React Router navigation.
+ */
+function Auth0ProviderWithNavigate({ children }) {
+  const navigate = useNavigate();
 
-if (rootElement) {
-  const reactRoot = createRoot(rootElement);
-  reactRoot.render(
+  return (
     <Auth0Provider
       domain={import.meta.env.VITE_AUTH0_DOMAIN}
       clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
@@ -23,9 +26,25 @@ if (rootElement) {
         audience: import.meta.env.VITE_AUTH0_AUDIENCE,
         scope: 'openid profile email'
       }}
+      onRedirectCallback={(appState) => {
+        navigate(appState?.returnTo || '/', { replace: true });
+      }}
     >
-      <App />
+      {children}
     </Auth0Provider>
+  );
+}
+
+const rootElement = document.getElementById("root");
+
+if (rootElement) {
+  const reactRoot = createRoot(rootElement);
+  reactRoot.render(
+    <BrowserRouter>
+      <Auth0ProviderWithNavigate>
+        <App />
+      </Auth0ProviderWithNavigate>
+    </BrowserRouter>
   );
 } else {
   console.error("Root element not found. No div with id='root' in index.html");
