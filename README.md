@@ -1,4 +1,4 @@
-# BrainCodeAI - Interview Prep Platform
+# BrainCodeAI - https://braincode-ai.vercel.app
 
 A comprehensive coding interview preparation platform that provides AI-powered feedback on coding solutions. Features user authentication, progress tracking, multiple problem categories, and an advanced code editor with real-time AI feedback.
 
