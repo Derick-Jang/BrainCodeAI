@@ -1,4 +1,6 @@
-# BrainCodeAI - https://braincode-ai.vercel.app
+# BrainCodeAI
+
+Link: https://braincode-ai.vercel.app
 
 A comprehensive coding interview preparation platform that provides AI-powered feedback on coding solutions. Features user authentication, progress tracking, multiple problem categories, and an advanced code editor with real-time AI feedback.
 
@@ -10,6 +12,7 @@ A comprehensive coding interview preparation platform that provides AI-powered f
 5. **Progress Tracking** - User completion tracking and statistics
 6. **Hint System** - AI-generated hints to help users when stuck
 7. **Responsive Design** - Modern UI with Tailwind CSS
+8. **Problem Recommendation** - Suggests new problems tailored by category or difficulty (Optional) 
 
 ## Tech Stack
 
@@ -132,85 +135,3 @@ The platform includes 17+ problem categories with comprehensive coding challenge
 - **Intervals** - Merge intervals, scheduling
 - **Math & Geometry** - Mathematical problem solving
 - **Bit Manipulation** - Bitwise operations
-
-## Getting Started
-
-### Prerequisites
-- Node.js (v18 or higher)
-- PostgreSQL database
-- OpenAI API key
-- Auth0 account and application
-
-### Database Setup
-1. Install PostgreSQL and create a database:
-   ```bash
-   # Create database
-   createdb braincodeai
-   
-   # Run schema
-   psql -d braincodeai -f backend/src/database/schema.sql
-   
-   # Load problem data (optional)
-   psql -d braincodeai -f backend/src/database/problems/arraysHashing.sql
-   # Repeat for other problem categories as needed
-   ```
-
-### Auth0 Setup
-1. Create an Auth0 account at [auth0.com](https://auth0.com)
-2. Create a new application (Single Page Application)
-3. Configure allowed callback URLs: `http://localhost:3000`
-4. Configure allowed logout URLs: `http://localhost:3000`
-5. Note down your Domain, Client ID, and Client Secret
-
-### Backend Setup
-1. Navigate to backend directory:
-   ```bash
-   cd backend
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Create environment file:
-   ```bash
-   # Copy the example environment file
-   cp .env.development.example .env
-   
-   # Edit the .env file with your configuration:
-   # - OpenAI API key
-   # - Auth0 credentials
-   # - PostgreSQL connection string
-   ```
-
-4. Start the server:
-   ```bash
-   npm run dev
-   ```
-   Server will run on `http://localhost:4000`
-
-### Frontend Setup
-1. Navigate to frontend directory:
-   ```bash
-   cd frontend
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Configure environment:
-   ```bash
-   # Copy the example environment file
-   cp .env.development.example .env.development
-   
-   # Edit .env.development with your Auth0 credentials
-   ```
-
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
-   Frontend will run on `http://localhost:3000`
